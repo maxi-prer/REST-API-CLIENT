@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java REST API Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .code-font { font-family: 'Courier New', monospace; }
+        .java-syntax { color: #0066cc; }
+        .string-literal { color: #008000; }
+        .keyword { color: #800080; }
+        .comment { color: #808080; font-style: italic; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">☕</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Java REST API Client</h1>
+                    <p class="text-gray-600">Test and interact with REST APIs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Request Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">🔧 Request Configuration</h2>
+                
+                <!-- HTTP Method -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">HTTP Method</label>
+                    <select id="httpMethod" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                    </select>
+                </div>
+
+                <!-- URL -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">API Endpoint URL</label>
+                    <input type="text" id="apiUrl" placeholder="https://api.example.com/users" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Headers -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Headers</label>
+                    <div id="headersContainer">
+                        <div class="flex space-x-2 mb-2">
+                            <input type="text" placeholder="Content-Type" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm header-key">
+                            <input type="text" placeholder="application/json" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm header-value">
+                            <button onclick="removeHeader(this)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm">×</button>
+                        </div>
+                    </div>
+                    <button onclick="addHeader()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">+ Add Header</button>
+                </div>
+
+                <!-- Request Body -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Request Body (JSON)</label>
+                    <textarea id="requestBody" rows="6" placeholder='{"name": "John Doe", "email": "john@example.com"}' 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 code-font text-sm"></textarea>
+                </div>
+
+                <!-- Send Button -->
+                <button onclick="sendRequest()" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 font-medium transition-colors">
+                    🚀 Send Request
+                </button>
+            </div>
+
+            <!-- Response Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 Response</h2>
+                
+                <!-- Status -->
+                <div class="mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700">Status:</span>
+                        <span id="responseStatus" class="px-2 py-1 rounded text-sm bg-gray-100">Ready</span>
+                    </div>
+                </div>
+
+                <!-- Response Headers -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Response Headers</h3>
+                    <div id="responseHeaders" class="bg-gray-50 rounded-md p-3 text-sm code-font min-h-[60px] border">
+                        <span class="text-gray-500">Headers will appear here...</span>
+                    </div>
+                </div>
+
+                <!-- Response Body -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Response Body</h3>
+                    <div id="responseBody" class="bg-gray-50 rounded-md p-3 text-sm code-font min-h-[200px] border overflow-auto">
+                        <span class="text-gray-500">Response will appear here...</span>
+                    </div>
+                </div>
+
+                <!-- Copy Response Button -->
+                <button onclick="copyResponse()" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 font-medium transition-colors">
+                    📋 Copy Response
+                </button>
+            </div>
+        </div>
+
+        <!-- Java Code Generation -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">☕ Generated Java Code</h2>
+            <div id="javaCode" class="bg-gray-900 text-green-400 rounded-md p-4 code-font text-sm overflow-auto min-h-[200px]">
+                <span class="comment">// Java code will be generated here based on your request configuration</span>
+            </div>
+            <button onclick="copyJavaCode()" class="mt-3 bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 font-medium transition-colors">
+                📋 Copy Java Code
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let requestHistory = [];
+
+        function addHeader() {
+            const container = document.getElementById('headersContainer');
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'flex space-x-2 mb-2';
+            headerDiv.innerHTML = `
+                <input type="text" placeholder="Header Name" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm header-key">
+                <input type="text" placeholder="Header Value" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm header-value">
+                <button onclick="removeHeader(this)" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm">×</button>
+            `;
+            container.appendChild(headerDiv);
+        }
+
+        function removeHeader(button) {
+            button.parentElement.remove();
+        }
+
+        function getHeaders() {
+            const headers = {};
+            const headerKeys = document.querySelectorAll('.header-key');
+            const headerValues = document.querySelectorAll('.header-value');
+            
+            for (let i = 0; i < headerKeys.length; i++) {
+                const key = headerKeys[i].value.trim();
+                const value = headerValues[i].value.trim();
+                if (key && value) {
+                    headers[key] = value;
+                }
+            }
+            return headers;
+        }
+
+        async function sendRequest() {
+            const method = document.getElementById('httpMethod').value;
+            const url = document.getElementById('apiUrl').value.trim();
+            const body = document.getElementById('requestBody').value.trim();
+            const headers = getHeaders();
+
+            if (!url) {
+                alert('Please enter an API URL');
+                return;
+            }
+
+            // Update status
+            const statusElement = document.getElementById('responseStatus');
+            statusElement.textContent = 'Loading...';
+            statusElement.className = 'px-2 py-1 rounded text-sm bg-yellow-100 text-yellow-800';
+
+            try {
+                const requestOptions = {
+                    method: method,
+                    headers: headers
+                };
+
+                if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+                    requestOptions.body = body;
+                }
+
+                const response = await fetch(url, requestOptions);
+                
+                // Update status
+                const statusClass = response.ok ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                statusElement.textContent = `${response.status} ${response.statusText}`;
+                statusElement.className = `px-2 py-1 rounded text-sm ${statusClass}`;
+
+                // Display response headers
+                const responseHeadersDiv = document.getElementById('responseHeaders');
+                let headersText = '';
+                response.headers.forEach((value, key) => {
+                    headersText += `${key}: ${value}\n`;
+                });
+                responseHeadersDiv.textContent = headersText || 'No headers';
+
+                // Display response body
+                const responseText = await response.text();
+                const responseBodyDiv = document.getElementById('responseBody');
+                
+                try {
+                    const jsonResponse = JSON.parse(responseText);
+                    responseBodyDiv.textContent = JSON.stringify(jsonResponse, null, 2);
+                } catch (e) {
+                    responseBodyDiv.textContent = responseText;
+                }
+
+                // Generate Java code
+                generateJavaCode(method, url, headers, body, response.status);
+
+            } catch (error) {
+                statusElement.textContent = 'Error';
+                statusElement.className = 'px-2 py-1 rounded text-sm bg-red-100 text-red-800';
+                
+                document.getElementById('responseHeaders').textContent = 'Error occurred';
+                document.getElementById('responseBody').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function generateJavaCode(method, url, headers, body, status) {
+            const javaCodeDiv = document.getElementById('javaCode');
+            
+            let headersCode = '';
+            Object.entries(headers).forEach(([key, value]) => {
+                headersCode += `        request.setHeader("${key}", "${value}");\n`;
+            });
+
+            let bodyCode = '';
+            if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+                bodyCode = `
+        // Set request body
+        StringEntity entity = new StringEntity("${body.replace(/"/g, '\\"')}", ContentType.APPLICATION_JSON);
+        request.setEntity(entity);`;
+            }
+
+            const javaCode = `<span class="keyword">import</span> org.apache.http.client.methods.*;
+<span class="keyword">import</span> org.apache.http.impl.client.*;
+<span class="keyword">import</span> org.apache.http.entity.*;
+<span class="keyword">import</span> org.apache.http.util.*;
+
+<span class="keyword">public class</span> <span class="java-syntax">RestApiClient</span> {
+    <span class="keyword">public static void</span> <span class="java-syntax">main</span>(String[] args) {
+        <span class="keyword">try</span> {
+            <span class="comment">// Create HTTP client</span>
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            
+            <span class="comment">// Create ${method} request</span>
+            Http${method.charAt(0) + method.slice(1).toLowerCase()} request = <span class="keyword">new</span> Http${method.charAt(0) + method.slice(1).toLowerCase()}(<span class="string-literal">"${url}"</span>);
+            
+            <span class="comment">// Set headers</span>
+${headersCode}${bodyCode}
+            
+            <span class="comment">// Execute request</span>
+            CloseableHttpResponse response = httpClient.execute(request);
+            
+            <span class="comment">// Get response status</span>
+            <span class="keyword">int</span> statusCode = response.getStatusLine().getStatusCode();
+            System.out.println(<span class="string-literal">"Status Code: "</span> + statusCode);
+            
+            <span class="comment">// Get response body</span>
+            String responseBody = EntityUtils.toString(response.getEntity());
+            System.out.println(<span class="string-literal">"Response: "</span> + responseBody);
+            
+            <span class="comment">// Close resources</span>
+            response.close();
+            httpClient.close();
+            
+        } <span class="keyword">catch</span> (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}`;
+
+            javaCodeDiv.innerHTML = javaCode;
+        }
+
+        function copyResponse() {
+            const responseBody = document.getElementById('responseBody').textContent;
+            navigator.clipboard.writeText(responseBody).then(() => {
+                alert('Response copied to clipboard!');
+            });
+        }
+
+        function copyJavaCode() {
+            const javaCode = document.getElementById('javaCode').textContent;
+            navigator.clipboard.writeText(javaCode).then(() => {
+                alert('Java code copied to clipboard!');
+            });
+        }
+
+        // Initialize with sample data
+        document.getElementById('apiUrl').value = 'https://jsonplaceholder.typicode.com/users/1';
+        generateJavaCode('GET', 'https://jsonplaceholder.typicode.com/users/1', {'Content-Type': 'application/json'}, '', 200);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bcbf4a368b7f7b',t:'MTc1NDYzMjM0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
